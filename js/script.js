@@ -51,7 +51,11 @@ const pokemonsDb = JSON.parse(localStorage.getItem('pokemonsDb'));
 
 
 $searchInput.addEventListener('input', e => {
-    const filterArr = pokemonsDb.filter(item => item.name.includes(e.target.value));
+
+    const searchString = e.target.value.toUpperCase();
+
+    const filterArr = pokemonsDb.filter(item => item.name.toUpperCase().includes(searchString));
+
     if(e.target.value !== ''){
         const template = filterArr.map(item => {
             return cardTemplate(item);
