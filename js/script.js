@@ -15,8 +15,33 @@ const pag10 = document.querySelector('.pag10');
 
 const $searchInput = document.querySelector('.searchInput');
 
+const $prevBtn = document.querySelector('.prevBtn');
+const $nextBtn = document.querySelector('.nextBtn');
+const $page = document.querySelector('.page');
+const LIMIT = 20;
+let pageCounter = 1;
+let offsetCounter = 0;
+const TOTAL_POKEMONS = 1118;
+const TOTAL_PAGES = Math.floor(TOTAL_POKEMONS / LIMIT);
+
+ 
 
 const baseUrl = 'https://pokeapi.co/api/v2';
+const getRequest = (url, query, cb) =>{
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', `${url}?${query}`);
+    xhr.addEventListener('load', () => {
+        const response = JSON.parse(xhr.response);
+        cb(response);
+    })
+    xhr.addEventListener('error', err => {
+        console.log('Возникла ошибка!');
+    })
+    xhr.send();
+   }
+   
+
 
 
 
@@ -50,6 +75,8 @@ window.addEventListener('load', () => {
 const pokemonsDb = JSON.parse(localStorage.getItem('pokemonsDb'));
 
 
+
+// Search input
 $searchInput.addEventListener('input', e => {
 
     const searchString = e.target.value.toUpperCase();
@@ -59,10 +86,12 @@ $searchInput.addEventListener('input', e => {
     if(e.target.value !== ''){
         const template = filterArr.map(item => {
             return cardTemplate(item);
+            
         }).join('');
         container.innerHTML = template;
+        
     }else{
-        getRequest(`${baseUrl}/pokemon`, 'offset=0&limit=100', res => {
+        getRequest(`${baseUrl}/pokemon`, 'offset=0&limit=20', res => {
             const temp = res.results.map(item => {
                 return cardTemplate(item)
             }).join('');
@@ -95,25 +124,27 @@ function cardTemplate(item){
 
 
 
-const getRequest = (url, query, cb) =>{
 
- const xhr = new XMLHttpRequest();
- xhr.open('GET', `${url}?${query}`);
- xhr.addEventListener('load', () => {
-     const response = JSON.parse(xhr.response);
-     cb(response);
- })
- xhr.addEventListener('error', err => {
-     console.log('Возникла ошибка!');
- })
- xhr.send();
+const getRequestPag = (url, query, cb) =>{
+
+    const baseUrl = 'https://pokeapi.co/api/v2';
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', `${baseUrl}/${url}?${query}`);
+    xhr.addEventListener('load', () => {
+        const response = JSON.parse(xhr.response);
+        cb(response);
+    })
+    xhr.addEventListener('error', err => {
+        console.log('Возникла ошибка!');
+    })
+    xhr.send();
 }
 
 
 
 window.addEventListener('load', () => {
     
-    getRequest(`${baseUrl}/pokemon`,'offset=0&limit=100', res => {
+    getRequestPag(`pokemon`,`offset=${offsetCounter}&limit=${LIMIT}`, res => {
         const temp = res.results.map(item => {
             return  `
                 <div class="wrapper">
@@ -139,309 +170,7 @@ window.addEventListener('load', () => {
 
 
 
-// Pagination
-pag1.addEventListener('click', e => {
-    e.preventDefault();
-    
-    getRequest(`${baseUrl}/pokemon`,'offset=0&limit=100', res => {
-        const temp = res.results.map(item => {
-            return  `
-                <div class="wrapper">
-                    <div style="background: url('./img/bg.jpg') center/ cover;" class="card front-face">
-                        <h1 class="neonText">${item.name}</h1>
-                    </div>
-                    <div class="card back-face">
-                        <img src="https://i1.wp.com/itc.ua/wp-content/uploads/2016/07/Pokemon_GO_i02.jpg?fit=770%2C546&quality=100&strip=all&ssl=1">
-                        <div class="info">
-                            <div class="title">
-                                ${item.name}
-                            </div>
-                        </div>
-                        <button onclick="singlePokemon('${item.url}')">More...</button>
-                    </div>
-                </div>
-            `
-        }).join('');
-
-        container.innerHTML = temp;
-    })
-})
-
-
-pag2.addEventListener('click', e => {
-    e.preventDefault();
-    
-    getRequest(`${baseUrl}/pokemon`,'offset=100&limit=200', res => {
-        const temp = res.results.map(item => {
-            return  `
-                <div class="wrapper">
-                    <div style="background: url('./img/bg.jpg') center/ cover;" class="card front-face">
-                        <h1 class="neonText">${item.name}</h1>
-                    </div>
-                    <div class="card back-face">
-                        <img src="https://i1.wp.com/itc.ua/wp-content/uploads/2016/07/Pokemon_GO_i02.jpg?fit=770%2C546&quality=100&strip=all&ssl=1">
-                        <div class="info">
-                            <div class="title">
-                                ${item.name}
-                            </div>
-                        </div>
-                        <button onclick="singlePokemon('${item.url}')">More...</button>
-                    </div>
-                </div>
-            `
-        }).join('');
-
-        container.innerHTML = temp;
-    })
-})
-
-
-
-
-pag3.addEventListener('click', e => {
-    e.preventDefault();
-    
-    getRequest(`${baseUrl}/pokemon`,'offset=200&limit=300', res => {
-        const temp = res.results.map(item => {
-            return  `
-                <div class="wrapper">
-                    <div style="background: url('./img/bg.jpg') center/ cover;" class="card front-face">
-                        <h1 class="neonText">${item.name}</h1>
-                    </div>
-                    <div class="card back-face">
-                        <img src="https://i1.wp.com/itc.ua/wp-content/uploads/2016/07/Pokemon_GO_i02.jpg?fit=770%2C546&quality=100&strip=all&ssl=1">
-                        <div class="info">
-                            <div class="title">
-                                ${item.name}
-                            </div>
-                        </div>
-                        <button onclick="singlePokemon('${item.url}')">More...</button>
-                    </div>
-                </div>
-            `
-        }).join('');
-
-        container.innerHTML = temp;
-    })
-})
-
-
-
-
-
-
-pag4.addEventListener('click', e => {
-    e.preventDefault();
-    
-    getRequest(`${baseUrl}/pokemon`,'offset=300&limit=400', res => {
-        const temp = res.results.map(item => {
-            return  `
-                <div class="wrapper">
-                    <div style="background: url('./img/bg.jpg') center/ cover;" class="card front-face">
-                        <h1 class="neonText">${item.name}</h1>
-                    </div>
-                    <div class="card back-face">
-                        <img src="https://i1.wp.com/itc.ua/wp-content/uploads/2016/07/Pokemon_GO_i02.jpg?fit=770%2C546&quality=100&strip=all&ssl=1">
-                        <div class="info">
-                            <div class="title">
-                                ${item.name}
-                            </div>
-                        </div>
-                        <button onclick="singlePokemon('${item.url}')">More...</button>
-                    </div>
-                </div>
-            `
-        }).join('');
-
-        container.innerHTML = temp;
-    })
-})
-
-
-
-
-
-pag5.addEventListener('click', e => {
-    e.preventDefault();
-    
-    getRequest(`${baseUrl}/pokemon`,'offset=400&limit=500', res => {
-        const temp = res.results.map(item => {
-            return  `
-                <div class="wrapper">
-                    <div style="background: url('./img/bg.jpg') center/ cover;" class="card front-face">
-                        <h1 class="neonText">${item.name}</h1>
-                    </div>
-                    <div class="card back-face">
-                        <img src="https://i1.wp.com/itc.ua/wp-content/uploads/2016/07/Pokemon_GO_i02.jpg?fit=770%2C546&quality=100&strip=all&ssl=1">
-                        <div class="info">
-                            <div class="title">
-                                ${item.name}
-                            </div>
-                        </div>
-                        <button onclick="singlePokemon('${item.url}')">More...</button>
-                    </div>
-                </div>
-            `
-        }).join('');
-
-        container.innerHTML = temp;
-    })
-})
-
-
-
-
-
-pag6.addEventListener('click', e => {
-    e.preventDefault();
-    
-    getRequest(`${baseUrl}/pokemon`,'offset=600&limit=700', res => {
-        const temp = res.results.map(item => {
-            return  `
-                <div class="wrapper">
-                    <div style="background: url('./img/bg.jpg') center/ cover;" class="card front-face">
-                        <h1 class="neonText">${item.name}</h1>
-                    </div>
-                    <div class="card back-face">
-                        <img src="https://i1.wp.com/itc.ua/wp-content/uploads/2016/07/Pokemon_GO_i02.jpg?fit=770%2C546&quality=100&strip=all&ssl=1">
-                        <div class="info">
-                            <div class="title">
-                                ${item.name}
-                            </div>
-                        </div>
-                        <button onclick="singlePokemon('${item.url}')">More...</button>
-                    </div>
-                </div>
-            `
-        }).join('');
-
-        container.innerHTML = temp;
-    })
-})
-
-
-
-
-pag7.addEventListener('click', e => {
-    e.preventDefault();
-    
-    getRequest(`${baseUrl}/pokemon`,'offset=700&limit=800', res => {
-        const temp = res.results.map(item => {
-            return  `
-                <div class="wrapper">
-                    <div style="background: url('./img/bg.jpg') center/ cover;" class="card front-face">
-                        <h1 class="neonText">${item.name}</h1>
-                    </div>
-                    <div class="card back-face">
-                        <img src="https://i1.wp.com/itc.ua/wp-content/uploads/2016/07/Pokemon_GO_i02.jpg?fit=770%2C546&quality=100&strip=all&ssl=1">
-                        <div class="info">
-                            <div class="title">
-                                ${item.name}
-                            </div>
-                        </div>
-                        <button onclick="singlePokemon('${item.url}')">More...</button>
-                    </div>
-                </div>
-            `
-        }).join('');
-
-        container.innerHTML = temp;
-    })
-})
-
-
-
-
-
-pag8.addEventListener('click', e => {
-    e.preventDefault();
-    
-    getRequest(`${baseUrl}/pokemon`,'offset=800&limit=900', res => {
-        const temp = res.results.map(item => {
-            return  `
-                <div class="wrapper">
-                    <div style="background: url('./img/bg.jpg') center/ cover;" class="card front-face">
-                        <h1 class="neonText">${item.name}</h1>
-                    </div>
-                    <div class="card back-face">
-                        <img src="https://i1.wp.com/itc.ua/wp-content/uploads/2016/07/Pokemon_GO_i02.jpg?fit=770%2C546&quality=100&strip=all&ssl=1">
-                        <div class="info">
-                            <div class="title">
-                                ${item.name}
-                            </div>
-                        </div>
-                        <button onclick="singlePokemon('${item.url}')">More...</button>
-                    </div>
-                </div>
-            `
-        }).join('');
-
-        container.innerHTML = temp;
-    })
-})
-
-
-
-
-pag9.addEventListener('click', e => {
-    e.preventDefault();
-    
-    getRequest(`${baseUrl}/pokemon`,'offset=900&limit=1000', res => {
-        const temp = res.results.map(item => {
-            return  `
-                <div class="wrapper">
-                    <div style="background: url('./img/bg.jpg') center/ cover;" class="card front-face">
-                        <h1 class="neonText">${item.name}</h1>
-                    </div>
-                    <div class="card back-face">
-                        <img src="https://i1.wp.com/itc.ua/wp-content/uploads/2016/07/Pokemon_GO_i02.jpg?fit=770%2C546&quality=100&strip=all&ssl=1">
-                        <div class="info">
-                            <div class="title">
-                                ${item.name}
-                            </div>
-                        </div>
-                        <button onclick="singlePokemon('${item.url}')">More...</button>
-                    </div>
-                </div>
-            `
-        }).join('');
-
-        container.innerHTML = temp;
-    })
-})
-
-
-
-pag10.addEventListener('click', e => {
-    e.preventDefault();
-    
-    getRequest(`${baseUrl}/pokemon`,'offset=1000&limit=1100', res => {
-        const temp = res.results.map(item => {
-            return  `
-                <div class="wrapper">
-                    <div style="background: url('./img/bg.jpg') center/ cover;" class="card front-face">
-                        <h1 class="neonText">${item.name}</h1>
-                    </div>
-                    <div class="card back-face">
-                        <img src="https://i1.wp.com/itc.ua/wp-content/uploads/2016/07/Pokemon_GO_i02.jpg?fit=770%2C546&quality=100&strip=all&ssl=1">
-                        <div class="info">
-                            <div class="title">
-                                ${item.name}
-                            </div>
-                        </div>
-                        <button onclick="singlePokemon('${item.url}')">More...</button>
-                    </div>
-                </div>
-            `
-        }).join('');
-
-        container.innerHTML = temp;
-    })
-})
-
-
-
-
+// More
 function singlePokemon(url){
     getRequest(url, '', res =>{
         console.log(res);
@@ -465,7 +194,6 @@ function singlePokemon(url){
                         <b>Height:</b>
                         <span>${res.height}</span>
                     </li>
-
                    
                     <li>
                         <b>Weight:</b>
@@ -491,46 +219,78 @@ function singlePokemon(url){
                         <b>Speed:</b>
                         <span>${res.stats[5].base_stat}</span>
                     </li> 
-                    <div class="buttons">
+                    <li>
                         <b>Abilities:</b>
-                        <button class="primary">
-                            ${res.abilities[0].ability.name}
-                        </button>
-                        <button class="primary ghost">
-                            ${res.abilities[1].ability.name}
-                        </button>                        
-                                                
-                    </div>
+                        <span style="background-color:green;padding: 3px 8px; border-radius: 6px;">${res.abilities[0].ability.name}</span>
+                    </li>                    
                 </ul>
-                <button style="padding: 10px 40px; border-radius: 8px; margin: 10px; font-weight: 600; color: #fff;background-color: #343a36a9; cursor: pointer; box-shadow:
-                0 0 7px #fff,
-                0 0 10px #fff,
-                0 0 21px rgb(208, 73, 235),
-                0 0 42px #f09
-                " onclick="refreshPage()">Back</button>
+                <button class="backBtn" onclick="refreshPage()">Back</button>
             </div>
         `
     })
 }
 
+
 function refreshPage(){
     window.location.reload();
+    
 } 
 
 
 
 
+// Pagination
+
+window.addEventListener('load', () => {
+    $page.innerHTML = pageCounter;
+    $prevBtn.setAttribute('disabled',true);
+});
+
+
+$nextBtn.addEventListener('click', e => {
+    e.preventDefault();
+    $prevBtn.removeAttribute('disabled');
+    if(pageCounter >= 1 && pageCounter <= TOTAL_PAGES){
+        if(pageCounter === TOTAL_PAGES){
+            $nextBtn.setAttribute('disabled', true);
+            getRequestPag('pokemon', `offset=${offsetCounter += LIMIT}&limit=${LIMIT}`, res => {
+                pageCounter++;
+                $page.innerHTML = pageCounter;
+                const temp = res.results.map(item => cardTemplate(item)).join('');
+                container.innerHTML = temp;
+            })
+        }else{
+            getRequestPag('pokemon', `offset=${offsetCounter += LIMIT}&limit=${LIMIT}`, res => {
+                pageCounter++;
+                $page.innerHTML = pageCounter;
+                const temp = res.results.map(item => cardTemplate(item)).join('');
+                container.innerHTML = temp;
+            })
+        }
+    }
+})
 
 
 
-// $('#demo').pagination({
-//     dataSource: [1, 2, 3, 4, 5, 6, 7,  40],
-//     pageSize: 5,
-//     showGoInput: true,
-//     showGoButton: true,
-//     callback: function(data, pagination) {
-//         // template method of yourself
-//         var html = template(data);
-//         dataContainer.html(html);
-//     }
-// })
+$prevBtn.addEventListener('click', e => {
+    e.preventDefault();
+    if(pageCounter >= 1){
+        pageCounter--;
+        if(pageCounter === 1){
+            $prevBtn.setAttribute('disabled', true);
+            offsetCounter = 0;
+            getRequestPag('pokemon', `offset=${offsetCounter}&limit=${LIMIT}`, res =>{
+                $page.innerHTML = pageCounter;
+                const temp = res.results.map(item => cardTemplate(item)).join('');
+                container.innerHTML = temp;
+            })
+        }else{
+            getRequestPag('pokemon', `offset=${offsetCounter -= LIMIT}&limit=${LIMIT}`, res => {
+                $nextBtn.removeAttribute('disabled');
+                $page.innerHTML = pageCounter;
+                const temp = res.results.map(item => cardTemplate(item)).join('');
+                container.innerHTML = temp;
+            })
+        }
+    }
+})
